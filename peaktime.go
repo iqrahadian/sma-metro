@@ -1,5 +1,7 @@
 package main
 
+const TIME_FORMAT string = "15:04:05"
+
 type Weekday int
 
 const (

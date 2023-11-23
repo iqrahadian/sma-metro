@@ -1,6 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
+
+type PeaktimeHour struct {
+	Start time.Time
+	End   time.Time
+}
 
 type TravelRoute struct {
 	From     Route
@@ -16,17 +24,19 @@ var travelroute = []TravelRoute{
 
 func main() {
 
-	var TravelFaresMap map[string]TravelFares = parseTravelFaresConfig()
-
+	var TravelFaresMap map[string]TravelFaresConfig = parseTravelFaresConfig()
 	fmt.Println(TravelFaresMap)
+
+	var PeaktimeMap map[Weekday][]PeaktimeHour = parsePeakTimeConfig()
+	fmt.Println(PeaktimeMap)
 
 }
 
-func parseTravelFaresConfig() map[string]TravelFares {
+func parseTravelFaresConfig() map[string]TravelFaresConfig {
 
-	faresMap := map[string]TravelFares{}
+	faresMap := map[string]TravelFaresConfig{}
 
-	for _, fare := range FaresConfig {
+	for _, fare := range FaresConfigArr {
 		key := fmt.Sprintf("%s%s", fare.Departure, fare.Destination)
 		if _, ok := faresMap[key]; !ok {
 			faresMap[key] = fare
@@ -35,4 +45,40 @@ func parseTravelFaresConfig() map[string]TravelFares {
 
 	return faresMap
 
+}
+
+func parsePeakTimeConfig() map[Weekday][]PeaktimeHour {
+
+	peaktimeMap := map[Weekday][]PeaktimeHour{}
+
+	for _, peaktime := range PeakTimeConfigArr {
+
+		startTimeStr := fmt.Sprintf("%s:00", peaktime.StartHour)
+		endTimeStr := fmt.Sprintf("%s:00", peaktime.EndHour)
+
+		startTime, err := time.Parse(TIME_FORMAT, startTimeStr)
+		if err != nil {
+			fmt.Println("Error parsing time:", peaktime.StartHour)
+			panic(err)
+		}
+
+		endTime, err := time.Parse(TIME_FORMAT, endTimeStr)
+		if err != nil {
+			fmt.Println("Error parsing time:", peaktime.EndHour)
+			panic(err)
+		}
+
+		for i := peaktime.FromDay; i <= peaktime.ToDay; i++ {
+
+			if val, ok := peaktimeMap[i]; !ok {
+				peaktimeMap[i] = []PeaktimeHour{{startTime, endTime}}
+			} else {
+				peaktimeMap[i] = append(val, PeaktimeHour{startTime, endTime})
+			}
+
+		}
+
+	}
+
+	return peaktimeMap
 }
