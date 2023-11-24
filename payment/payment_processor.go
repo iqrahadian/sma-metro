@@ -24,31 +24,28 @@ func (c *creditCardProcessor) Charge(
 ) (cost int, balance int, error common.Error) {
 
 	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
-
 	routeFare, ok := route.TravelFaresMap[stasion]
 	if !ok {
-		return cost, balance, common.Error{Code: common.FaresUnknown}
+		return cost, balance, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
 	}
 
-	travelTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
+	tripTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
 	if err != nil {
-		panic(fmt.Errorf("Failed to parse travel time, err : %v", err))
+		return cost, balance, common.Error{err, common.InternalParseTriptime}
 	}
-	_, currentWeek := travelTime.ISOWeek()
+	_, currentWeek := tripTime.ISOWeek()
 
-	// fareUsages, ok := card.Transactions[stasion]
 	cardUsages := &smartCard.Transactions
 	fareUsages, ok := (*cardUsages)[stasion]
 	if !ok {
 		fareUsages = new(card.FareSpending)
-		// card.SetUsages(stasion, fareUsages)
 		smartCard.Transactions[stasion] = fareUsages
 	} else {
 
 		if fareUsages.LastWeekUsed < currentWeek {
 			fareUsages.WeeklySpending = 0
 			fareUsages.DailySpending = 0
-		} else if fareUsages.LastDayUsed < int(travelTime.Weekday()) {
+		} else if fareUsages.LastDayUsed < int(tripTime.Weekday()) {
 			fareUsages.DailySpending = 0
 		}
 
@@ -68,7 +65,10 @@ func (c *creditCardProcessor) Charge(
 	}
 
 	cost = routeFare.StandardCost
-	if route.IsPeaktimePrice(travelRoute) {
+	isPeak, error := route.IsPeaktimePrice(travelRoute)
+	if error.Error != nil {
+		return cost, balance, error
+	} else if isPeak {
 		cost = routeFare.PeakCost
 	}
 
@@ -86,7 +86,7 @@ func (c *creditCardProcessor) Charge(
 	fareUsages.DailySpending += cost
 	fareUsages.WeeklySpending += cost
 	fareUsages.LastWeekUsed = currentWeek
-	fareUsages.LastDayUsed = int(travelTime.Weekday())
+	fareUsages.LastDayUsed = int(tripTime.Weekday())
 
 	return cost, balance, error
 

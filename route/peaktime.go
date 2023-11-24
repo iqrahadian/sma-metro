@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/iqrahadian/sma-metro/common"
 	"github.com/iqrahadian/sma-metro/util"
 )
 
@@ -33,7 +34,7 @@ func init() {
 	PeaktimeMap = parsePeakTimeConfig()
 }
 
-func IsPeaktimePrice(route TravelRoute) bool {
+func IsPeaktimePrice(route TravelRoute) (bool, common.Error) {
 
 	travelTime, _ := time.Parse(util.DATE_TIME_FORMAT, route.TripTime)
 
@@ -41,13 +42,16 @@ func IsPeaktimePrice(route TravelRoute) bool {
 
 	for _, peakTime := range peakTimes {
 
-		if util.IsTimeBetween(travelTime, peakTime.Start, peakTime.End) {
-			return true
+		isPeak, err := util.IsTimeBetween(travelTime, peakTime.Start, peakTime.End)
+		if err.Error != nil {
+			return isPeak, err
+		} else if isPeak {
+			return isPeak, err
 		}
 
 	}
 
-	return false
+	return false, common.Error{}
 
 }
 
