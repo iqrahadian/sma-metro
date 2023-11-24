@@ -52,11 +52,11 @@ func (c *creditCardProcessor) Charge(
 	}
 
 	maxDeduction := 0
-	if fareUsages.DailySpending < routeFare.DailyCap {
+	if fareUsages.DailySpending < routeFare.DailyCap && routeFare.DailyCap > 0 {
 		maxDeduction = routeFare.DailyCap - fareUsages.DailySpending
 	}
 
-	if maxDeduction > 0 && fareUsages.WeeklySpending < routeFare.WeeklyCap {
+	if maxDeduction > 0 && fareUsages.WeeklySpending < routeFare.WeeklyCap && routeFare.WeeklyCap > 0 {
 		maxWeekDeduction := routeFare.WeeklyCap - fareUsages.WeeklySpending
 
 		if maxDeduction > maxWeekDeduction {
