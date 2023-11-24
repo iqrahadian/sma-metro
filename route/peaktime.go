@@ -7,11 +7,6 @@ import (
 	"github.com/iqrahadian/sma-metro/util"
 )
 
-type PeaktimeHour struct {
-	Start time.Time
-	End   time.Time
-}
-
 type PeakTimeConfig struct {
 	FromDay   time.Weekday
 	ToDay     time.Weekday
@@ -25,6 +20,11 @@ var PeakTimeConfigArr = []PeakTimeConfig{
 	{time.Saturday, time.Saturday, "10:00", "14:00"},
 	{time.Saturday, time.Saturday, "18:00", "23:00"},
 	{time.Sunday, time.Sunday, "18:00", "23:00"},
+}
+
+type PeaktimeHour struct {
+	Start time.Time
+	End   time.Time
 }
 
 var PeaktimeMap map[time.Weekday][]PeaktimeHour

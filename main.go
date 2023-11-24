@@ -19,6 +19,7 @@ var travelRoutes = []route.TravelRoute{
 	{route.GreenLine, route.RedLine, "2021-03-12T09:58:30"},
 	{route.GreenLine, route.RedLine, "2021-03-12T09:58:30"},
 	{route.RedLine, route.RedLine, "2021-03-30T11:58:30"},
+	{route.GreenLine, route.GreenLine, "2021-03-02T07:58:30"},
 }
 
 func main() {
@@ -29,7 +30,7 @@ func main() {
 	// init new card, in real case we retrieve from db by id
 	smartCard := card.InitCard(card.CreditCardType)
 
-	paymentGateway.Topup(&smartCard, 100)
+	paymentGateway.Topup(&smartCard, 4)
 
 	for _, travelRoute := range travelRoutes {
 

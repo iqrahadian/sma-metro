@@ -44,7 +44,7 @@ var ErrorMap = map[ErrorCode]string{
 func GetErrorMessage(code ErrorCode) string {
 
 	if baseString, ok := ErrorMap[code]; ok {
-		return fmt.Sprintf("Sorry, %s,please call our customer service", baseString)
+		return fmt.Sprintf("%d | Sorry, %s,please call our customer service", code, baseString)
 	} else {
 		return GetErrorMessage(InternalUnknownError)
 	}
