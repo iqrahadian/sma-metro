@@ -41,7 +41,7 @@ func main() {
 	}
 
 	fmt.Println("Final Card Balance : ", smartCard.Balance)
-	fmt.Println("Total Spending : ", totalSpending)
+	fmt.Println("Total Fare Applied : ", totalSpending)
 
 }
 
