@@ -27,10 +27,10 @@ func main() {
 	// init payment gateway service
 	paymentGateway := payment.PaymentGateway{}
 
-	// init new card, in real case we retrieve from db by id
+	// init new card, in real case we retrieve from storage by id
 	smartCard := card.InitCard(card.CreditCardType)
 
-	paymentGateway.Topup(&smartCard, 4)
+	paymentGateway.Topup(&smartCard, 100)
 
 	for _, travelRoute := range travelRoutes {
 
