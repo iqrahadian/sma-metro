@@ -1,5 +1,7 @@
 package card
 
+import "fmt"
+
 type CardType string
 
 const (
@@ -24,6 +26,14 @@ type SmartCard struct {
 }
 
 func InitCard(cardType CardType) SmartCard {
+
+	switch cardType {
+	case CreditCardType:
+	case NFCDebitType:
+	case NFCRechargeableType:
+	default:
+		panic(fmt.Sprintf("Oops, Cannot recognize card type %s", cardType))
+	}
 
 	return SmartCard{
 		Type:         cardType,

@@ -35,9 +35,9 @@ func main() {
 		}
 	}
 
-	for key, value := range *&smartCard.Transactions {
-		fmt.Println("Key:", key, "Value:", value)
-	}
+	// for key, value := range *&smartCard.Transactions {
+	// 	fmt.Println("Key:", key, "Value:", value)
+	// }
 
 	fmt.Println("Final Card Balance : ", smartCard.Balance)
 

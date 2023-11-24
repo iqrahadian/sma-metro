@@ -11,19 +11,22 @@ import (
 )
 
 type paymentProcessor interface {
-	Charge(*card.SmartCard, route.TravelRoute) error
+	Charge(*card.SmartCard, route.TravelRoute) (cost int, balance int, err error)
 	Topup(*card.SmartCard, int) error
 }
 
 type creditCardProcessor struct{}
 
-func (c *creditCardProcessor) Charge(smartCard *card.SmartCard, travelRoute route.TravelRoute) error {
+func (c *creditCardProcessor) Charge(
+	smartCard *card.SmartCard,
+	travelRoute route.TravelRoute,
+) (cost int, balance int, err error) {
 
 	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
 
 	routeFare, ok := route.TravelFaresMap[stasion]
 	if !ok {
-		return errors.New("Failed to retrieve route fares")
+		return cost, balance, errors.New("Failed to retrieve route fares")
 	}
 
 	travelTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
@@ -63,7 +66,7 @@ func (c *creditCardProcessor) Charge(smartCard *card.SmartCard, travelRoute rout
 		}
 	}
 
-	cost := routeFare.StandardCost
+	cost = routeFare.StandardCost
 	if route.IsPeaktimePrice(travelRoute) {
 		cost = routeFare.PeakCost
 	}
@@ -73,18 +76,18 @@ func (c *creditCardProcessor) Charge(smartCard *card.SmartCard, travelRoute rout
 	}
 
 	if smartCard.Balance < cost {
-		return errors.New("Not enough balance")
+		return cost, balance, errors.New("Not enough balance")
 	}
 
 	smartCard.Balance -= cost
-	// card.Topup(cost * -1)
+	balance = smartCard.Balance
 
 	fareUsages.DailySpending += cost
 	fareUsages.WeeklySpending += cost
 	fareUsages.LastWeekUsed = currentWeek
 	fareUsages.LastDayUsed = int(travelTime.Weekday())
 
-	return nil
+	return cost, balance, err
 
 }
 
