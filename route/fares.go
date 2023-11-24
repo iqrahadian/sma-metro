@@ -1,6 +1,13 @@
 package route
 
-import "fmt"
+import (
+	"encoding/csv"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+)
 
 type TravelFaresConfig struct {
 	Departure    string
@@ -9,13 +16,6 @@ type TravelFaresConfig struct {
 	PeakCost     int
 	DailyCap     int
 	WeeklyCap    int
-}
-
-var FaresConfigArr = []TravelFaresConfig{
-	{"green", "green", 2, 1, 8, 55},
-	{"red", "red", 3, 2, 12, 70},
-	{"green", "red", 4, 3, 15, 90},
-	{"red", "green", 3, 2, 15, 90},
 }
 
 var TravelFaresMap map[string]TravelFaresConfig
@@ -28,13 +28,42 @@ func parseTravelFaresConfig() map[string]TravelFaresConfig {
 
 	faresMap := map[string]TravelFaresConfig{}
 
-	for _, fare := range FaresConfigArr {
-		key := fmt.Sprintf("%s%s", fare.Departure, fare.Destination)
-		if _, ok := faresMap[key]; !ok {
-			faresMap[key] = fare
+	f, err := os.Open("./input/fares.csv")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	// read csv values using csv.Reader
+	csvReader := csv.NewReader(f)
+	data, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for i, line := range data {
+		if i > 0 { // omit header line
+			var tmpFare TravelFaresConfig
+			tmpFare.Departure = strings.ToLower(line[0])
+			tmpFare.Destination = strings.ToLower(line[1])
+
+			standardCost, _ := strconv.Atoi(line[2])
+			tmpFare.StandardCost = standardCost
+
+			peakCost, _ := strconv.Atoi(line[3])
+			tmpFare.PeakCost = peakCost
+
+			dailyCap, _ := strconv.Atoi(line[4])
+			tmpFare.DailyCap = dailyCap
+
+			weeklyCap, _ := strconv.Atoi(line[2])
+			tmpFare.WeeklyCap = weeklyCap
+
+			key := fmt.Sprintf("%s%s", tmpFare.Departure, tmpFare.Destination)
+
+			faresMap[key] = tmpFare
 		}
 	}
 
 	return faresMap
-
 }
