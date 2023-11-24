@@ -47,11 +47,11 @@ func parseTravelFaresConfig() map[string]TravelFaresConfig {
 			tmpFare.Departure = strings.ToLower(line[0])
 			tmpFare.Destination = strings.ToLower(line[1])
 
-			standardCost, _ := strconv.Atoi(line[2])
-			tmpFare.StandardCost = standardCost
-
-			peakCost, _ := strconv.Atoi(line[3])
+			peakCost, _ := strconv.Atoi(line[2])
 			tmpFare.PeakCost = peakCost
+
+			standardCost, _ := strconv.Atoi(line[3])
+			tmpFare.StandardCost = standardCost
 
 			dailyCap, _ := strconv.Atoi(line[4])
 			tmpFare.DailyCap = dailyCap

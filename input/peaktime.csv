@@ -1,0 +1,6 @@
+from,to,starttime,endtime
+monday,friday,08:00,10:00
+monday,friday,16:30,19:00
+saturday,saturday,10:00,14:00
+saturday,saturday,18:00,23:00
+sunday,sunday,18:00,23:00

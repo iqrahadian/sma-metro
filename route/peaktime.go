@@ -1,7 +1,10 @@
 package route
 
 import (
+	"encoding/csv"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/iqrahadian/sma-metro/common"
@@ -13,14 +16,6 @@ type PeakTimeConfig struct {
 	ToDay     time.Weekday
 	StartHour string
 	EndHour   string
-}
-
-var PeakTimeConfigArr = []PeakTimeConfig{
-	{time.Monday, time.Friday, "08:00", "10:00"},
-	{time.Monday, time.Friday, "16:30", "19:00"},
-	{time.Saturday, time.Saturday, "10:00", "14:00"},
-	{time.Saturday, time.Saturday, "18:00", "23:00"},
-	{time.Sunday, time.Sunday, "18:00", "23:00"},
 }
 
 type PeaktimeHour struct {
@@ -57,7 +52,44 @@ func IsPeaktimePrice(route TravelRoute) (bool, common.Error) {
 
 func parsePeakTimeConfig() map[time.Weekday][]PeaktimeHour {
 
+	var daysOfWeek = map[string]time.Weekday{
+		"sunday":    time.Sunday,
+		"monday":    time.Monday,
+		"tuesday":   time.Tuesday,
+		"wednesday": time.Wednesday,
+		"thursday":  time.Thursday,
+		"friday":    time.Friday,
+		"saturday":  time.Saturday,
+	}
+
 	peaktimeMap := map[time.Weekday][]PeaktimeHour{}
+	PeakTimeConfigArr := []PeakTimeConfig{}
+
+	f, err := os.Open("./input/peaktime.csv")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	// read csv values using csv.Reader
+	csvReader := csv.NewReader(f)
+	data, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for i, line := range data {
+		if i > 0 { // omit header line
+			tmpConfig := PeakTimeConfig{
+				FromDay:   daysOfWeek[line[0]],
+				ToDay:     daysOfWeek[line[1]],
+				StartHour: line[2],
+				EndHour:   line[3],
+			}
+
+			PeakTimeConfigArr = append(PeakTimeConfigArr, tmpConfig)
+		}
+	}
 
 	for _, peaktime := range PeakTimeConfigArr {
 
