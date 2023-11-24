@@ -3,8 +3,8 @@ package route
 import "fmt"
 
 type TravelFaresConfig struct {
-	Departure    Route
-	Destination  Route
+	Departure    string
+	Destination  string
 	StandardCost int
 	PeakCost     int
 	DailyCap     int
@@ -12,10 +12,10 @@ type TravelFaresConfig struct {
 }
 
 var FaresConfigArr = []TravelFaresConfig{
-	{GreenLine, GreenLine, 2, 1, 8, 55},
-	{RedLine, RedLine, 3, 2, 12, 70},
-	{GreenLine, RedLine, 4, 3, 15, 90},
-	{RedLine, GreenLine, 3, 2, 15, 90},
+	{"green", "green", 2, 1, 8, 55},
+	{"red", "red", 3, 2, 12, 70},
+	{"green", "red", 4, 3, 15, 90},
+	{"red", "green", 3, 2, 15, 90},
 }
 
 var TravelFaresMap map[string]TravelFaresConfig

@@ -1,7 +1,11 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/iqrahadian/sma-metro/card"
@@ -10,19 +14,9 @@ import (
 	"github.com/iqrahadian/sma-metro/route"
 )
 
-var travelRoutes = []route.TravelRoute{
-	{route.GreenLine, route.GreenLine, "2021-03-01T07:58:30"},
-	{route.GreenLine, route.GreenLine, "2021-03-01T12:58:30"},
-	{route.GreenLine, route.GreenLine, "2021-03-01T07:58:30"},
-	{route.GreenLine, route.GreenLine, "2021-03-01T12:58:30"},
-	{route.GreenLine, route.GreenLine, "2021-03-01T07:58:30"},
-	{route.GreenLine, route.RedLine, "2021-03-12T09:58:30"},
-	{route.GreenLine, route.RedLine, "2021-03-12T09:58:30"},
-	{route.RedLine, route.RedLine, "2021-03-30T11:58:30"},
-	{route.GreenLine, route.GreenLine, "2021-03-02T07:58:30"},
-}
-
 func main() {
+
+	travelRoutes := loadInput()
 
 	// init payment gateway service
 	paymentGateway := payment.PaymentGateway{}
@@ -43,5 +37,37 @@ func main() {
 	}
 
 	fmt.Println("Final Card Balance : ", smartCard.Balance)
+
+}
+
+func loadInput() []route.TravelRoute {
+
+	travelRoutes := []route.TravelRoute{}
+
+	f, err := os.Open("./input/input.csv")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	// read csv values using csv.Reader
+	csvReader := csv.NewReader(f)
+	data, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for i, line := range data {
+		if i > 0 { // omit header line
+			var tmpRoute route.TravelRoute
+			tmpRoute.From = strings.ToLower(line[0])
+			tmpRoute.To = strings.ToLower(line[1])
+			tmpRoute.TripTime = line[2]
+
+			travelRoutes = append(travelRoutes, tmpRoute)
+		}
+	}
+
+	return travelRoutes
 
 }

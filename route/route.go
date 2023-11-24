@@ -3,12 +3,12 @@ package route
 type Route string
 
 const (
-	GreenLine Route = "Green"
-	RedLine         = "Red"
+	GreenLine Route = "green"
+	RedLine         = "red"
 )
 
 type TravelRoute struct {
-	From     Route
-	To       Route
+	From     string
+	To       string
 	TripTime string
 }
