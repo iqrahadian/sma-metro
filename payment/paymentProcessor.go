@@ -1,34 +1,44 @@
-package main
+package payment
 
 import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/iqrahadian/sma-metro/card"
+	"github.com/iqrahadian/sma-metro/route"
+	"github.com/iqrahadian/sma-metro/util"
 )
 
-// func ChargeCard(card *CreditCard, route TravelRoute) error {
-func ChargeCard(card SmartCard, route TravelRoute) error {
+type paymentProcessor interface {
+	Charge(*card.SmartCard, route.TravelRoute) error
+	Topup(*card.SmartCard, int) error
+}
 
-	stasion := fmt.Sprintf("%s%s", route.From, route.To)
+type creditCardProcessor struct{}
 
-	routeFare, ok := TravelFaresMap[stasion]
+func (c *creditCardProcessor) Charge(smartCard *card.SmartCard, travelRoute route.TravelRoute) error {
+
+	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
+
+	routeFare, ok := route.TravelFaresMap[stasion]
 	if !ok {
 		return errors.New("Failed to retrieve route fares")
 	}
 
-	travelTime, err := time.Parse(DATE_TIME_FORMAT, route.TripTime)
+	travelTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
 	if err != nil {
 		panic(fmt.Errorf("Failed to parse travel time, err : %v", err))
 	}
 	_, currentWeek := travelTime.ISOWeek()
 
 	// fareUsages, ok := card.Transactions[stasion]
-	cardUsages := card.GetUsages()
+	cardUsages := &smartCard.Transactions
 	fareUsages, ok := (*cardUsages)[stasion]
 	if !ok {
-		fareUsages = new(FareSpending)
-		card.SetUsages(stasion, fareUsages)
-		// card.Transactions[stasion] = fareUsages
+		fareUsages = new(card.FareSpending)
+		// card.SetUsages(stasion, fareUsages)
+		smartCard.Transactions[stasion] = fareUsages
 	} else {
 
 		if fareUsages.LastWeekUsed < currentWeek {
@@ -54,7 +64,7 @@ func ChargeCard(card SmartCard, route TravelRoute) error {
 	}
 
 	cost := routeFare.StandardCost
-	if IsPeaktimePrice(route) {
+	if route.IsPeaktimePrice(travelRoute) {
 		cost = routeFare.PeakCost
 	}
 
@@ -62,12 +72,12 @@ func ChargeCard(card SmartCard, route TravelRoute) error {
 		cost = maxDeduction
 	}
 
-	if card.GetBalance() < cost {
-		// if card.Balance < cost {
+	if smartCard.Balance < cost {
 		return errors.New("Not enough balance")
 	}
 
-	card.Topup(cost * -1)
+	smartCard.Balance -= cost
+	// card.Topup(cost * -1)
 
 	fareUsages.DailySpending += cost
 	fareUsages.WeeklySpending += cost
@@ -75,41 +85,10 @@ func ChargeCard(card SmartCard, route TravelRoute) error {
 	fareUsages.LastDayUsed = int(travelTime.Weekday())
 
 	return nil
-}
-
-func IsPeaktimePrice(route TravelRoute) bool {
-
-	travelTime, _ := time.Parse(DATE_TIME_FORMAT, route.TripTime)
-
-	peakTimes, _ := PeaktimeMap[travelTime.Weekday()]
-
-	for _, peakTime := range peakTimes {
-
-		if IsTimeBetween(travelTime, peakTime.Start, peakTime.End) {
-			return true
-		}
-
-	}
-
-	return false
 
 }
 
-func IsTimeBetween(checkTime, startTime, endTime time.Time) bool {
-
-	timeStr := checkTime.Format(TIME_FORMAT)
-	newTime, err := time.Parse(TIME_FORMAT, timeStr)
-	if err != nil {
-		fmt.Println("HOHO")
-		panic(err)
-	}
-
-	return !newTime.Before(startTime) && !newTime.After(endTime)
-}
-
-func TopupCard(card *CreditCard, amount int) error {
-
+func (c *creditCardProcessor) Topup(card *card.SmartCard, amount int) error {
 	card.Balance += amount
-
 	return nil
 }
