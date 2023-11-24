@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/iqrahadian/sma-metro/card"
+	"github.com/iqrahadian/sma-metro/common"
 	"github.com/iqrahadian/sma-metro/payment"
 	"github.com/iqrahadian/sma-metro/route"
 )
@@ -21,8 +23,10 @@ var travelRoutes = []route.TravelRoute{
 
 func main() {
 
+	// init payment gateway service
 	paymentGateway := payment.PaymentGateway{}
 
+	// init new card, in real case we retrieve from db by id
 	smartCard := card.InitCard(card.CreditCardType)
 
 	paymentGateway.Topup(&smartCard, 100)
@@ -30,14 +34,12 @@ func main() {
 	for _, travelRoute := range travelRoutes {
 
 		err := paymentGateway.Charge(&smartCard, travelRoute)
-		if err != nil {
-			panic(fmt.Errorf("Failed to charge card %v", err))
+		if err.Error != nil {
+			time.Sleep(500 * time.Millisecond)
+			fmt.Println(common.GetErrorMessage(common.ErrorCode(err.Code)))
+			fmt.Println("--------------------------------------------------------->")
 		}
 	}
-
-	// for key, value := range *&smartCard.Transactions {
-	// 	fmt.Println("Key:", key, "Value:", value)
-	// }
 
 	fmt.Println("Final Card Balance : ", smartCard.Balance)
 

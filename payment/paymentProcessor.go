@@ -6,13 +6,14 @@ import (
 	"time"
 
 	"github.com/iqrahadian/sma-metro/card"
+	"github.com/iqrahadian/sma-metro/common"
 	"github.com/iqrahadian/sma-metro/route"
 	"github.com/iqrahadian/sma-metro/util"
 )
 
 type paymentProcessor interface {
-	Charge(*card.SmartCard, route.TravelRoute) (cost int, balance int, err error)
-	Topup(*card.SmartCard, int) error
+	Charge(*card.SmartCard, route.TravelRoute) (cost int, balance int, err common.Error)
+	Topup(*card.SmartCard, int) common.Error
 }
 
 type creditCardProcessor struct{}
@@ -20,13 +21,13 @@ type creditCardProcessor struct{}
 func (c *creditCardProcessor) Charge(
 	smartCard *card.SmartCard,
 	travelRoute route.TravelRoute,
-) (cost int, balance int, err error) {
+) (cost int, balance int, error common.Error) {
 
 	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
 
 	routeFare, ok := route.TravelFaresMap[stasion]
 	if !ok {
-		return cost, balance, errors.New("Failed to retrieve route fares")
+		return cost, balance, common.Error{Code: common.FaresUnknown}
 	}
 
 	travelTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
@@ -76,7 +77,7 @@ func (c *creditCardProcessor) Charge(
 	}
 
 	if smartCard.Balance < cost {
-		return cost, balance, errors.New("Not enough balance")
+		return cost, balance, common.Error{errors.New("Not enough balance"), common.CardInsufficientBalance}
 	}
 
 	smartCard.Balance -= cost
@@ -87,11 +88,11 @@ func (c *creditCardProcessor) Charge(
 	fareUsages.LastWeekUsed = currentWeek
 	fareUsages.LastDayUsed = int(travelTime.Weekday())
 
-	return cost, balance, err
+	return cost, balance, error
 
 }
 
-func (c *creditCardProcessor) Topup(card *card.SmartCard, amount int) error {
+func (c *creditCardProcessor) Topup(card *card.SmartCard, amount int) common.Error {
 	card.Balance += amount
-	return nil
+	return common.Error{}
 }
