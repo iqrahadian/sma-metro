@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-type PeaktimeHour struct {
-	Start time.Time
-	End   time.Time
-}
-
 type TravelRoute struct {
 	From     Route
 	To       Route
@@ -17,18 +12,46 @@ type TravelRoute struct {
 }
 
 var travelroute = []TravelRoute{
-	{GreenLine, GreenLine, "2021-03-24T07:58:30"},
-	{GreenLine, RedLine, "2021-03-24T09:58:30"},
-	{RedLine, RedLine, "2021-03-25T11:58:30"},
+	{GreenLine, GreenLine, "2021-03-01T07:58:30"},
+	{GreenLine, GreenLine, "2021-03-01T12:58:30"},
+	{GreenLine, GreenLine, "2021-03-01T07:58:30"},
+	{GreenLine, GreenLine, "2021-03-01T12:58:30"},
+	{GreenLine, GreenLine, "2021-03-01T07:58:30"},
+	{GreenLine, RedLine, "2021-03-12T09:58:30"},
+	{GreenLine, RedLine, "2021-03-12T09:58:30"},
+	{RedLine, RedLine, "2021-03-30T11:58:30"},
 }
+
+var (
+	TravelFaresMap map[string]TravelFaresConfig    = parseTravelFaresConfig()
+	PeaktimeMap    map[time.Weekday][]PeaktimeHour = parsePeakTimeConfig()
+)
 
 func main() {
 
-	var TravelFaresMap map[string]TravelFaresConfig = parseTravelFaresConfig()
-	fmt.Println(TravelFaresMap)
+	// var card = CreditCard{CreditCardType, 0, FareUsage{}}
+	var card = InitCard(CreditCardType)
 
-	var PeaktimeMap map[Weekday][]PeaktimeHour = parsePeakTimeConfig()
-	fmt.Println(PeaktimeMap)
+	card.Topup(100)
+	// err := TopupCard(card, 100)
+	// if err != nil {
+	// 	fmt.Println("Failed to topup card", err)
+	// }
+
+	for _, route := range travelroute {
+		err := ChargeCard(card, route)
+		if err != nil {
+			panic(fmt.Errorf("Failed to charge card %v", err))
+		}
+	}
+
+	fmt.Println(card)
+
+	for key, value := range *card.GetUsages() {
+		fmt.Println("Key:", key, "Value:", value)
+	}
+
+	fmt.Println("Final Card Balance : ", card.GetBalance())
 
 }
 
@@ -47,24 +70,28 @@ func parseTravelFaresConfig() map[string]TravelFaresConfig {
 
 }
 
-func parsePeakTimeConfig() map[Weekday][]PeaktimeHour {
+func parsePeakTimeConfig() map[time.Weekday][]PeaktimeHour {
 
-	peaktimeMap := map[Weekday][]PeaktimeHour{}
+	peaktimeMap := map[time.Weekday][]PeaktimeHour{}
 
 	for _, peaktime := range PeakTimeConfigArr {
+
+		if peaktime.FromDay > peaktime.ToDay {
+			panic("Oops, something wrong with peaktime config, Start & End day config is not correct")
+		}
 
 		startTimeStr := fmt.Sprintf("%s:00", peaktime.StartHour)
 		endTimeStr := fmt.Sprintf("%s:00", peaktime.EndHour)
 
 		startTime, err := time.Parse(TIME_FORMAT, startTimeStr)
 		if err != nil {
-			fmt.Println("Error parsing time:", peaktime.StartHour)
+			fmt.Println("Oops, something wrong with peaktime config, Failed to parse time:", peaktime.StartHour)
 			panic(err)
 		}
 
 		endTime, err := time.Parse(TIME_FORMAT, endTimeStr)
 		if err != nil {
-			fmt.Println("Error parsing time:", peaktime.EndHour)
+			fmt.Println("Oops, something wrong with peaktime config, Failed to parse time:", peaktime.EndHour)
 			panic(err)
 		}
 

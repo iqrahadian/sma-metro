@@ -1,24 +1,66 @@
 package main
 
-import "time"
+import (
+	"fmt"
+)
 
 type SmartCard interface {
-	Charge(route TravelRoute) error
-	Topup(amount int)
+	GetBalance() int
+	Topup(amount int) error
+	GetUsages() *FareUsage
+	SetUsages(stasion string, fareSpending *FareSpending)
+}
+
+func InitCard(cardType CardType) SmartCard {
+
+	switch cardType {
+	case CreditCardType:
+		return &CreditCard{CreditCardType, 0, &FareUsage{}}
+	default:
+		panic(fmt.Sprintf("%s card type is not recognized", cardType))
+	}
+
 }
 
 type CardType string
 
 const (
-	CreditCard      CardType = "credit"
-	NFCDebit                 = "nfcdebit"
-	NFCRechargeable          = "nfcrechargeable"
+	CreditCardType      CardType = "credit"
+	NFCDebitType                 = "nfcdebit"
+	NFCRechargeableType          = "nfcrechargeable"
 )
 
-type Card struct {
-	Type               CardType
-	Balance            int
-	DailyUsage         int
-	WeeklyUsage        int
-	TransactionHistory map[time.Month]map[int]map[Weekday][]Transaction
+type CreditCard struct {
+	Type    CardType
+	Balance int
+	// Transactions FareUsage
+	Transactions *FareUsage
+}
+
+func (c *CreditCard) GetBalance() int {
+	return c.Balance
+}
+
+func (c *CreditCard) Topup(amount int) error {
+	c.Balance += amount
+	return nil
+}
+
+func (c *CreditCard) GetUsages() *FareUsage {
+	return c.Transactions
+}
+
+func (c *CreditCard) SetUsages(stasion string, fareSpending *FareSpending) {
+	(*c.Transactions)[stasion] = fareSpending
+}
+
+// init another card type
+
+type FareUsage map[string]*FareSpending
+
+type FareSpending struct {
+	LastWeekUsed   int
+	LastDayUsed    int
+	WeeklySpending int
+	DailySpending  int
 }
