@@ -27,8 +27,7 @@ FareSpending{
 	DailySpending  int
 }
 ```
-FareUsage, storing information of each route line combination, combination mean : Green->Red = GreenRed
-
+FareUsage, storing information of each route line combination, combination mean : Green->Red = GreenRed  
 FareUsage will be used to store information for each route card holder has been going through
 
 
