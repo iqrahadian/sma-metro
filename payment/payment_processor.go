@@ -16,7 +16,9 @@ type paymentProcessor interface {
 	Topup(*card.SmartCard, int) common.Error
 }
 
-type creditCardProcessor struct{}
+type creditCardProcessor struct {
+	rs *route.RouteService
+}
 
 func (c *creditCardProcessor) Charge(
 	smartCard *card.SmartCard,
@@ -30,9 +32,10 @@ func (c *creditCardProcessor) Charge(
 	_, currentWeek := tripTime.ISOWeek()
 
 	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
-	routeFare, ok := route.TravelFaresMap[stasion]
-	if !ok {
-		return totalCost, newBalance, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
+
+	routeFare, error := c.rs.GetRouteFare(stasion)
+	if error.Error != nil {
+		return totalCost, newBalance, error
 	}
 
 	cardUsages := &smartCard.Transactions
@@ -51,12 +54,9 @@ func (c *creditCardProcessor) Charge(
 
 	}
 
-	totalCost = routeFare.StandardCost
-	isPeak, error := route.IsPeaktimePrice(travelRoute)
+	totalCost, error = c.rs.GetTravelCost(travelRoute)
 	if error.Error != nil {
 		return totalCost, newBalance, error
-	} else if isPeak {
-		totalCost = routeFare.PeakCost
 	}
 
 	maxDeduction := 0

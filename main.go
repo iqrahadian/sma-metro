@@ -18,8 +18,7 @@ func main() {
 
 	travelRoutes := loadInput()
 
-	// init payment gateway service
-	paymentGateway := payment.PaymentGateway{}
+	paymentGateway := payment.NewPaymentGateway()
 
 	// init new card, in real case we retrieve from storage by id
 	smartCard := card.InitCard(card.CreditCardType)

@@ -10,6 +10,12 @@ import (
 	"github.com/iqrahadian/sma-metro/route"
 )
 
+func NewPaymentGateway() *PaymentGateway {
+
+	rs := route.NewRouteService()
+	return &PaymentGateway{rs}
+}
+
 type PaymentGateway struct {
 	rs *route.RouteService
 }
@@ -61,7 +67,7 @@ func (p *PaymentGateway) getProcessor(cardType card.CardType) (paymentProcessor,
 
 	switch cardType {
 	case card.CreditCardType:
-		return &creditCardProcessor{}, common.Error{}
+		return &creditCardProcessor{p.rs}, common.Error{}
 	default:
 		return nil, common.Error{
 			Code: common.CardTypeUnrecognized,

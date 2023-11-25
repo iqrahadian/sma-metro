@@ -22,6 +22,10 @@ type TravelRoute struct {
 	TripTime string
 }
 
+func NewRouteService() *RouteService {
+	return &RouteService{}
+}
+
 type RouteService struct{}
 
 func (r *RouteService) GetTravelCost(travelRoute TravelRoute) (cost int, error common.Error) {
@@ -42,6 +46,17 @@ func (r *RouteService) GetTravelCost(travelRoute TravelRoute) (cost int, error c
 	}
 
 	return cost, error
+}
+
+func (r *RouteService) GetRouteFare(stasion string) (routeFare TravelFaresConfig, err common.Error) {
+
+	routeFare, ok := TravelFaresMap[stasion]
+	if !ok {
+		return routeFare, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
+	}
+
+	return routeFare, err
+
 }
 
 func (r *RouteService) isPeaktime(route TravelRoute) (bool, common.Error) {
