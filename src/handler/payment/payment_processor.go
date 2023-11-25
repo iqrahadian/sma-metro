@@ -17,6 +17,10 @@ type paymentProcessor interface {
 	Topup(*model.SmartCard, int) common.Error
 }
 
+type Credit struct {
+	creditCardProcessor
+}
+
 type creditCardProcessor struct {
 	rs *route.RouteService
 	cs *card.CardService
@@ -29,7 +33,7 @@ func (c *creditCardProcessor) Charge(
 
 	tripTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
 	if err != nil {
-		return travelCost, newBalance, common.Error{err, common.InternalParseTriptime}
+		return travelCost, newBalance, common.Error{Error: err, Code: common.InternalParseTriptime}
 	}
 	_, currentWeek := tripTime.ISOWeek()
 
@@ -37,7 +41,7 @@ func (c *creditCardProcessor) Charge(
 
 	routeFare, error := c.rs.GetRouteFare(stasion)
 	if err != nil {
-		return travelCost, newBalance, common.Error{err, common.InternalParseTriptime}
+		return travelCost, newBalance, common.Error{Error: err, Code: common.InternalParseTriptime}
 	}
 
 	currentFareSpending := c.cs.GetFareSpending(smartCard, stasion)
@@ -63,7 +67,7 @@ func (c *creditCardProcessor) Charge(
 	}
 
 	if smartCard.Balance < travelCost {
-		return travelCost, newBalance, common.Error{errors.New("Not enough balance"), common.CardInsufficientBalance}
+		return travelCost, newBalance, common.Error{Error: errors.New("Not enough balance"), Code: common.CardInsufficientBalance}
 	}
 
 	c.cs.UpdateCardBalance(
@@ -76,6 +80,14 @@ func (c *creditCardProcessor) Charge(
 
 	return travelCost, smartCard.Balance, error
 
+}
+
+func (c *creditCardProcessor) GetMaxDeduction(
+	routeFare model.TravelFaresConfig,
+	dailySpend int,
+	weeklySpend int,
+) int {
+	return c.getMaxDeduction(routeFare, dailySpend, weeklySpend)
 }
 
 func (c *creditCardProcessor) getMaxDeduction(

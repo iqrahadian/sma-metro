@@ -76,9 +76,9 @@ func parsePeakTimeConfig() map[time.Weekday][]model.PeaktimeHour {
 		for i := peaktime.FromDay; i <= peaktime.ToDay; i++ {
 
 			if val, ok := peaktimeMap[i]; !ok {
-				peaktimeMap[i] = []model.PeaktimeHour{{startTime, endTime}}
+				peaktimeMap[i] = []model.PeaktimeHour{{Start: startTime, End: endTime}}
 			} else {
-				peaktimeMap[i] = append(val, model.PeaktimeHour{startTime, endTime})
+				peaktimeMap[i] = append(val, model.PeaktimeHour{Start: startTime, End: endTime})
 			}
 
 		}

@@ -16,6 +16,41 @@ import (
 )
 
 func main() {
+	type testData struct {
+		result      int
+		dailySpend  int
+		weeklySpend int
+	}
+
+	ccProcessor := payment.Credit{}
+
+	routeFares := model.TravelFaresConfig{
+		DailyCap:  10,
+		WeeklyCap: 50,
+	}
+
+	testArr := []testData{
+		{5, 5, 10},
+	}
+
+	for _, singleTest := range testArr {
+
+		maxDeduction := ccProcessor.GetMaxDeduction(
+			routeFares,
+			singleTest.dailySpend,
+			singleTest.weeklySpend,
+		)
+
+		// fmt.Println("Max Deduction Result : %v, Want %v", maxDeduction, singleTest.result)
+		if maxDeduction == singleTest.result {
+			// fmt.Println("Max Deduction Result : %v, Want %v", maxDeduction, singleTest.result)
+			fmt.Println("sama")
+			return
+		}
+	}
+}
+
+func main2() {
 
 	travelRoutes := loadInput()
 

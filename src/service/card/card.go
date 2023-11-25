@@ -26,7 +26,7 @@ func (c *CardService) UpdateCardBalance(
 
 	tripTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
 	if err != nil {
-		return common.Error{err, common.InternalParseTriptime}
+		return common.Error{Error: err, Code: common.InternalParseTriptime}
 	}
 	_, currentWeek := tripTime.ISOWeek()
 
@@ -34,7 +34,7 @@ func (c *CardService) UpdateCardBalance(
 
 	fareSpending, ok := card.Transactions[stasion]
 	if !ok {
-		return common.Error{errors.New("Unkown Route"), common.FaresUnknown}
+		return common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
 	}
 
 	card.Balance -= totalCost

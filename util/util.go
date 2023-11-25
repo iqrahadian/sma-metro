@@ -16,7 +16,7 @@ func IsTimeBetween(checkTime, startTime, endTime time.Time) (bool, common.Error)
 	timeStr := checkTime.Format(TIME_FORMAT)
 	newTime, err := time.Parse(TIME_FORMAT, timeStr)
 	if err != nil {
-		return false, common.Error{err, common.InternalParseTriptime}
+		return false, common.Error{Error: err, Code: common.InternalParseTriptime}
 	}
 
 	return !newTime.Before(startTime) && !newTime.After(endTime), common.Error{}
