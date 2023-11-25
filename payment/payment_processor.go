@@ -21,18 +21,18 @@ type creditCardProcessor struct{}
 func (c *creditCardProcessor) Charge(
 	smartCard *card.SmartCard,
 	travelRoute route.TravelRoute,
-) (cost int, balance int, error common.Error) {
+) (totalCost int, newBalance int, error common.Error) {
 
 	tripTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
 	if err != nil {
-		return cost, balance, common.Error{err, common.InternalParseTriptime}
+		return totalCost, newBalance, common.Error{err, common.InternalParseTriptime}
 	}
 	_, currentWeek := tripTime.ISOWeek()
 
 	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
 	routeFare, ok := route.TravelFaresMap[stasion]
 	if !ok {
-		return cost, balance, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
+		return totalCost, newBalance, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
 	}
 
 	cardUsages := &smartCard.Transactions
@@ -51,12 +51,12 @@ func (c *creditCardProcessor) Charge(
 
 	}
 
-	cost = routeFare.StandardCost
+	totalCost = routeFare.StandardCost
 	isPeak, error := route.IsPeaktimePrice(travelRoute)
 	if error.Error != nil {
-		return cost, balance, error
+		return totalCost, newBalance, error
 	} else if isPeak {
-		cost = routeFare.PeakCost
+		totalCost = routeFare.PeakCost
 	}
 
 	maxDeduction := 0
@@ -72,23 +72,23 @@ func (c *creditCardProcessor) Charge(
 		}
 	}
 
-	if cost > maxDeduction {
-		cost = maxDeduction
+	if totalCost > maxDeduction {
+		totalCost = maxDeduction
 	}
 
-	if smartCard.Balance < cost {
-		return cost, balance, common.Error{errors.New("Not enough balance"), common.CardInsufficientBalance}
+	if smartCard.Balance < totalCost {
+		return totalCost, newBalance, common.Error{errors.New("Not enough balance"), common.CardInsufficientBalance}
 	}
 
-	smartCard.Balance -= cost
-	balance = smartCard.Balance
+	smartCard.Balance -= totalCost
+	newBalance = smartCard.Balance
 
-	fareUsages.DailySpending += cost
-	fareUsages.WeeklySpending += cost
+	fareUsages.DailySpending += totalCost
+	fareUsages.WeeklySpending += totalCost
 	fareUsages.LastWeekUsed = currentWeek
 	fareUsages.LastDayUsed = int(tripTime.Weekday())
 
-	return cost, balance, error
+	return totalCost, newBalance, error
 
 }
 
