@@ -6,21 +6,9 @@ import (
 	"time"
 
 	"github.com/iqrahadian/sma-metro/common"
+	"github.com/iqrahadian/sma-metro/src/model"
 	"github.com/iqrahadian/sma-metro/util"
 )
-
-type Route string
-
-const (
-	GreenLine Route = "green"
-	RedLine         = "red"
-)
-
-type TravelRoute struct {
-	From     string
-	To       string
-	TripTime string
-}
 
 func NewRouteService() *RouteService {
 
@@ -34,11 +22,11 @@ func NewRouteService() *RouteService {
 }
 
 type RouteService struct {
-	peakTimeMap    map[time.Weekday][]PeaktimeHour
-	travelFaresMap map[string]TravelFaresConfig
+	peakTimeMap    map[time.Weekday][]model.PeaktimeHour
+	travelFaresMap map[string]model.TravelFaresConfig
 }
 
-func (r *RouteService) GetTravelCost(travelRoute TravelRoute) (cost int, error common.Error) {
+func (r *RouteService) GetTravelCost(travelRoute model.TravelRoute, cardUsage *model.FareUsage) (cost int, error common.Error) {
 
 	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
 
@@ -58,7 +46,7 @@ func (r *RouteService) GetTravelCost(travelRoute TravelRoute) (cost int, error c
 	return cost, error
 }
 
-func (r *RouteService) GetRouteFare(stasion string) (routeFare TravelFaresConfig, err common.Error) {
+func (r *RouteService) GetRouteFare(stasion string) (routeFare model.TravelFaresConfig, err common.Error) {
 
 	routeFare, ok := r.travelFaresMap[stasion]
 	if !ok {
@@ -69,7 +57,7 @@ func (r *RouteService) GetRouteFare(stasion string) (routeFare TravelFaresConfig
 
 }
 
-func (r *RouteService) isPeaktime(route TravelRoute) (bool, common.Error) {
+func (r *RouteService) isPeaktime(route model.TravelRoute) (bool, common.Error) {
 
 	travelTime, _ := time.Parse(util.DATE_TIME_FORMAT, route.TripTime)
 

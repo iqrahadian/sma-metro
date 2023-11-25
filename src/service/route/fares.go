@@ -7,22 +7,15 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/iqrahadian/sma-metro/src/model"
 )
 
-type TravelFaresConfig struct {
-	Departure    string
-	Destination  string
-	StandardCost int
-	PeakCost     int
-	DailyCap     int
-	WeeklyCap    int
-}
+func parseTravelFaresConfig() map[string]model.TravelFaresConfig {
 
-func parseTravelFaresConfig() map[string]TravelFaresConfig {
+	faresMap := map[string]model.TravelFaresConfig{}
 
-	faresMap := map[string]TravelFaresConfig{}
-
-	f, err := os.Open("./input/fares.csv")
+	f, err := os.Open("./data/fares.csv")
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +29,7 @@ func parseTravelFaresConfig() map[string]TravelFaresConfig {
 
 	for i, line := range data {
 		if i > 0 { // omit header line
-			var tmpFare TravelFaresConfig
+			var tmpFare model.TravelFaresConfig
 			tmpFare.Departure = strings.ToLower(line[0])
 			tmpFare.Destination = strings.ToLower(line[1])
 

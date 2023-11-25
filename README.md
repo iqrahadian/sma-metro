@@ -1,7 +1,7 @@
 # sma-metro
 
 - to run simply just `go run main.go`
-- to change input, all config stored under /input folder
+- to change input, all config stored under /data folder
 
 ## code structure/ideas
 1. A card is an object that stores balance and transaction data. However, it shouldn't alter its own information.

@@ -8,20 +8,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/iqrahadian/sma-metro/card"
 	"github.com/iqrahadian/sma-metro/common"
-	"github.com/iqrahadian/sma-metro/payment"
-	"github.com/iqrahadian/sma-metro/route"
+	"github.com/iqrahadian/sma-metro/src/handler/payment"
+	"github.com/iqrahadian/sma-metro/src/model"
+	"github.com/iqrahadian/sma-metro/src/service/card"
+	"github.com/iqrahadian/sma-metro/src/service/route"
 )
 
 func main() {
 
 	travelRoutes := loadInput()
 
-	paymentGateway := payment.NewPaymentGateway()
+	rs := route.NewRouteService()
+	cs := card.NewCardService()
+	paymentGateway := payment.NewPaymentHandler(rs, cs)
 
 	// init new card, in real case we retrieve from storage by id
-	smartCard := card.InitCard(card.CreditCardType)
+	smartCard := cs.NewCard(model.CreditCardType)
 
 	paymentGateway.Topup(&smartCard, 100)
 
@@ -44,11 +47,11 @@ func main() {
 
 }
 
-func loadInput() []route.TravelRoute {
+func loadInput() []model.TravelRoute {
 
-	travelRoutes := []route.TravelRoute{}
+	travelRoutes := []model.TravelRoute{}
 
-	f, err := os.Open("./input/input.csv")
+	f, err := os.Open("./data/input.csv")
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +66,7 @@ func loadInput() []route.TravelRoute {
 
 	for i, line := range data {
 		if i > 0 { // omit header line
-			var tmpRoute route.TravelRoute
+			var tmpRoute model.TravelRoute
 			tmpRoute.From = strings.ToLower(line[0])
 			tmpRoute.To = strings.ToLower(line[1])
 			tmpRoute.TripTime = line[2]

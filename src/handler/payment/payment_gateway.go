@@ -5,22 +5,25 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/iqrahadian/sma-metro/card"
 	"github.com/iqrahadian/sma-metro/common"
-	"github.com/iqrahadian/sma-metro/route"
+	"github.com/iqrahadian/sma-metro/src/model"
+	"github.com/iqrahadian/sma-metro/src/service/card"
+	"github.com/iqrahadian/sma-metro/src/service/route"
 )
 
-func NewPaymentGateway() *PaymentGateway {
-
-	rs := route.NewRouteService()
-	return &PaymentGateway{rs}
+func NewPaymentHandler(
+	rs *route.RouteService,
+	cs *card.CardService,
+) *PaymentGateway {
+	return &PaymentGateway{rs, cs}
 }
 
 type PaymentGateway struct {
 	rs *route.RouteService
+	cs *card.CardService
 }
 
-func (p *PaymentGateway) Charge(card *card.SmartCard, travelRoute route.TravelRoute) (cost int, err common.Error) {
+func (p *PaymentGateway) Charge(card *model.SmartCard, travelRoute model.TravelRoute) (cost int, err common.Error) {
 
 	time.Sleep(500 * time.Millisecond)
 	fmt.Println("Processing payment for trip from", travelRoute.From, "to", travelRoute.To, "on", travelRoute.TripTime)
@@ -42,7 +45,7 @@ func (p *PaymentGateway) Charge(card *card.SmartCard, travelRoute route.TravelRo
 	return cost, err
 }
 
-func (p *PaymentGateway) Topup(card *card.SmartCard, amount int) common.Error {
+func (p *PaymentGateway) Topup(card *model.SmartCard, amount int) common.Error {
 
 	time.Sleep(500 * time.Millisecond)
 	fmt.Println(fmt.Sprintf("Processing Card topup for $%d", amount))
@@ -63,11 +66,11 @@ func (p *PaymentGateway) Topup(card *card.SmartCard, amount int) common.Error {
 	return common.Error{}
 }
 
-func (p *PaymentGateway) getProcessor(cardType card.CardType) (paymentProcessor, common.Error) {
+func (p *PaymentGateway) getProcessor(cardType model.CardType) (paymentProcessor, common.Error) {
 
 	switch cardType {
-	case card.CreditCardType:
-		return &creditCardProcessor{p.rs}, common.Error{}
+	case model.CreditCardType:
+		return &creditCardProcessor{p.rs, p.cs}, common.Error{}
 	default:
 		return nil, common.Error{
 			Code: common.CardTypeUnrecognized,
