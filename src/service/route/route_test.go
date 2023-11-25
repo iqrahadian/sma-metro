@@ -55,7 +55,6 @@ func TestGetTravelCost(t *testing.T) {
 	}
 
 	testData := []testStruct{
-
 		{1, model.TravelRoute{From: "green", To: "green", TripTime: "2021-03-01T08:58:30"}},
 		{2, model.TravelRoute{From: "green", To: "green", TripTime: "2021-03-01T07:58:30"}},
 		{3, model.TravelRoute{From: "green", To: "red", TripTime: "2021-03-01T08:58:30"}},
