@@ -96,19 +96,29 @@ func (c *creditCardProcessor) getMaxDeduction(
 	weeklySpend int,
 ) int {
 
-	maxDeduction := 0
-	if routeFare.DailyCap > 0 && dailySpend < routeFare.DailyCap {
+	if routeFare.DailyCap == 0 && routeFare.WeeklyCap == 0 {
+		return 999 // assume highest cost
+	}
 
+	maxDeduction := 0
+
+	if routeFare.DailyCap > 0 && dailySpend <= routeFare.DailyCap {
 		maxDeduction = routeFare.DailyCap - dailySpend
 
-	} else if routeFare.WeeklyCap > 0 && weeklySpend < routeFare.WeeklyCap {
+		if maxDeduction == 0 { // return early, daily cap reached
+			return 0
+		}
+	}
+
+	if routeFare.WeeklyCap > 0 && weeklySpend <= routeFare.WeeklyCap {
 
 		maxWeekDeduction := routeFare.WeeklyCap - weeklySpend
 
-		if maxDeduction > maxWeekDeduction {
+		if maxDeduction > maxWeekDeduction || maxDeduction == 0 {
 			maxDeduction = maxWeekDeduction
 		}
 	}
+	fmt.Println(maxDeduction)
 
 	return maxDeduction
 }
