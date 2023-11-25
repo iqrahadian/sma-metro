@@ -34,20 +34,18 @@ FareSpending, storing usage information of single line combination
 All 4 attributes value will be close to realtime as possible  
 
 LastWeekUsed will follow ISO Week, so it can be 52-53 in a year  
-	if LastWeekUsed < Current ISO Week  
-	WeeklySpending & DailySpending will be reset to 0 before trip calculation  
+&emsp;if LastWeekUsed < Current ISO Week  
+&emsp;WeeklySpending & DailySpending will be reset to 0 before trip calculation  
 
 LastDayUsed will follow numeric weekday system, sunday as 0 and saturday as 7  
-	if LastDayUsed < Current Weekday  
-	DailySpending will be reset to 0 before trip calculation  
+&emsp;if LastDayUsed < Current Weekday  
+&emsp;DailySpending will be reset to 0 before trip calculation  
 
 ### Payment Gateway
-paymentGateway class : payment interface & decide on how to process card based on the card type
-
-have 2 function, Charge & Topup as interface to outside world
+paymentGateway class : payment interface & decide on how to process card based on the card type  
+it has 2 function, Charge & Topup as interface to outside world  
 
 Payment gateway class will create a new payment processor based on Card type submitted for each function, so to handle each card type the  logic will be isolated on the payment processor
-
 
 ```
 paymentProcessor interface {
@@ -56,15 +54,14 @@ paymentProcessor interface {
 }
 ```
 
+Topup can be as simple as incresing the balance, or can be complex depend on the card type  
 
-Topup can be as simple as incresing the balance, or can be complex depend on the card type
-
-Charge flow generally will looks like :
-    1. check route fare config (from->to)
-    2. check peaktime/non peaktime cost
-    3. check card total spending, deciding on max deduction for this trip
-       check 2 things, daily spending and weekly spending, compared to route fare caps
-    4. compare fare cost to max deduction, if cost higher than max deduction,
-       max deduciton used as cost, making sure the user does not overcharged
-    5. deduct balance
-    6. update Card FareSpending information
+Charge flow generally will looks like :  
+1. check route fare config (from->to)
+2. check peaktime/non peaktime cost
+3. check card total spending, deciding on max deduction for this trip
+check 2 things, daily spending and weekly spending, compared to route fare caps
+4. compare fare cost to max deduction, if cost higher than max deduction,
+max deduciton used as cost, making sure the user does not overcharged
+5. deduct balance
+6. update Card FareSpending information
