@@ -6,10 +6,15 @@ import (
 	"github.com/iqrahadian/sma-metro/src/model"
 )
 
+var (
+	peakTimeFile    = "../../../data/peaktime_test.csv"
+	travelFaresFile = "../../../data/fares_test.csv"
+)
+
 func TestIsPeakTime(t *testing.T) {
 
-	peakTimeMap := parsePeakTimeConfig("../../../data/peaktime_test.csv")
-	travelFaresMap := parseTravelFaresConfig("../../../data/fares_test.csv")
+	peakTimeMap := parsePeakTimeConfig(peakTimeFile)
+	travelFaresMap := parseTravelFaresConfig(travelFaresFile)
 	rs := RouteService{
 		peakTimeMap,
 		travelFaresMap,
@@ -42,8 +47,8 @@ func TestIsPeakTime(t *testing.T) {
 
 func TestGetTravelCost(t *testing.T) {
 
-	peakTimeMap := parsePeakTimeConfig("../../../data/peaktime_test.csv")
-	travelFaresMap := parseTravelFaresConfig("../../../data/fares_test.csv")
+	peakTimeMap := parsePeakTimeConfig(peakTimeFile)
+	travelFaresMap := parseTravelFaresConfig(travelFaresFile)
 	rs := RouteService{
 		peakTimeMap,
 		travelFaresMap,
