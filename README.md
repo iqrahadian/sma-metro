@@ -4,13 +4,13 @@
 - to change input, all config stored under /input folder
 
 ## code structure/ideas
-1. card is an object holding balance & transaction data, but should not modify it's own information
-2. all data changes executed by PaymentGateway class, it's represent a payment services
-3. I add 3 digit number for error code identifier, will be printed when error arised, representing a card tap machine that can only show limited information
+1. A card is an object that stores balance and transaction data. However, it shouldn't alter its own information.
+2. The PaymentGateway class manages all data changes and functions as the representation of payment services.
+3. I used a three-digit error code to identify errors. This code will be displayed when errors occur, similar to a card tap machine that can only show limited information.
 
 ## object/class description
 ### Card
-card object will hold information about the card, such as CardType, Balance & FareUsages
+A card is an object that stores balance and transaction data. However, it shouldn't alter its own information.
 ```
 Card {
     CardType string
@@ -27,26 +27,27 @@ FareSpending{
 	DailySpending  int
 }
 ```
-**FareUsage**, storing information of each route line combination, combination mean : Green->Red = GreenRed  
-FareUsage will be used to store information for each route card holder has been going through  
 
-**FareSpending**, storing usage information of single line combination  
-All 4 attributes value will be close to realtime as possible  
+**FareUsage** stores information for each route-line combination, where combinations are denoted as such: Green->Red = GreenRed.  
+This feature is utilized to retain data regarding the routes a cardholder has traveled through.  
 
-**LastWeekUsed** will follow ISO Week, so it can be 52-53 in a year  
+**FareSpending**, storing usage information of single line combination.  
+All four attribute values aim to reflect real-time data as closely as possible.  
+
+**LastWeekUsed** will follow ISO Week, allowing the values ranging from 52 to 53 in a year  
 &emsp;if LastWeekUsed < Current ISO Week  
-&emsp;**WeeklySpending** & **DailySpending** will be reset to 0 before trip calculation  
+&emsp;**WeeklySpending** & **DailySpending** will reset to 0 before trip calculations.  
 
-**LastDayUsed** will follow numeric weekday system, sunday as 0 and saturday as 7  
+**LastDayUsed** will follow numeric weekday system, Sunday as 0 and Saturday as 7  
 &emsp;if LastDayUsed < Current Weekday  
-&emsp;**DailySpending** will be reset to 0 before trip calculation  
+&emsp;**DailySpending** will be reset to 0 before trip calculation.  
 
 ### Payment Gateway
-paymentGateway class : payment interface & decide on how to process card based on the card type  
-it has 2 function, **Charge** & **Topup** as interface to outside world  
+paymentGateway class will serve payment interface & decide on how to process card based on the card type.  
+it has 2 function, **Charge** & **Topup** acting as the interface for external interactions.  
 
-Payment gateway class will create a new **PaymentProcessor** based on Card type processed,  
-so each card type logic will be owned by PaymentProcessor
+Payment gateway class will create a new **PaymentProcessor** based on processed Card type,  
+This structure ensures that each card type's logic is contained within its respective PaymentProcessor.  
 
 ```
 paymentProcessor interface {
@@ -55,14 +56,14 @@ paymentProcessor interface {
 }
 ```
 
-Topup can be as simple as incresing the balance, or can be complex depend on the card type  
+Topup can be as simple as incresing the balance, or can be complex depend on the card type.  
 
-Charge flow generally will looks like :  
-1. check route fare config (from->to)
-2. check peaktime/non peaktime cost
-3. check card total spending, deciding on **max deduction** for this trip  
-&emsp;&emsp;check 2 things, daily spending and weekly spending, compared to route fare caps
-4. compare fare cost to max deduction, if cost higher than max deduction,  
-&emsp;&emsp;max deduciton used as cost, making sure the user does not overcharged
-5. deduct balance
-6. update Card FareSpending information
+Charge flow typically follows these steps:  
+1. Check the route fare configuration from origin to destination.
+2. Check peak-time or non-peak-time costs.
+3. Check card's total spending to determine the maxDeduction for the trip,  
+&emsp;&emsp;check 2 things, daily spending and weekly spending, compared to route fare caps.
+4. Compare the fare cost to the maxDeduction. If the cost exceeds the maxDeduction,  
+&emsp;&emsp;max deduciton used as cost to ensure the user is not overcharged
+5. Deduct the trip's cost from card's balance.
+6. Update the Card's FareSpending information.
