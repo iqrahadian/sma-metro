@@ -17,10 +17,6 @@ type paymentProcessor interface {
 	Topup(*model.SmartCard, int) common.Error
 }
 
-type Credit struct {
-	creditCardProcessor
-}
-
 type creditCardProcessor struct {
 	rs *route.RouteService
 	cs *card.CardService
@@ -80,14 +76,6 @@ func (c *creditCardProcessor) Charge(
 
 	return travelCost, smartCard.Balance, error
 
-}
-
-func (c *creditCardProcessor) GetMaxDeduction(
-	routeFare model.TravelFaresConfig,
-	dailySpend int,
-	weeklySpend int,
-) int {
-	return c.getMaxDeduction(routeFare, dailySpend, weeklySpend)
 }
 
 func (c *creditCardProcessor) getMaxDeduction(
