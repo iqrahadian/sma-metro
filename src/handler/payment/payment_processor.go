@@ -106,7 +106,6 @@ func (c *creditCardProcessor) getMaxDeduction(
 			maxDeduction = maxWeekDeduction
 		}
 	}
-	fmt.Println(maxDeduction)
 
 	return maxDeduction
 }
