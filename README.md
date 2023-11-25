@@ -28,27 +28,18 @@ FareSpending{
 }
 ```
 FareUsage, storing information of each route line combination, combination mean : Green->Red = GreenRed  
-FareUsage will be used to store information for each route card holder has been going through
+FareUsage will be used to store information for each route card holder has been going through  
 
+FareSpending, storing usage information of single line combination  
+All 4 attributes value will be close to realtime as possible  
 
-FareSpending, storing usage information of single line combination
+LastWeekUsed will follow ISO Week, so it can be 52-53 in a year  
+	if LastWeekUsed < Current ISO Week  
+	WeeklySpending & DailySpending will be reset to 0 before trip calculation  
 
-All 4 attributes value will be close to realtime as possible
-
-
-LastWeekUsed will follow ISO Week, so it can be 52-53 in a year
-
-if LastWeekUsed < Current ISO Week
-
-WeeklySpending & DailySpending will be reset to 0 before trip calculation
-
-
-LastDayUsed will follow numeric weekday system, sunday as 0 and saturday as 7
-
-if LastDayUsed < Current Weekday
-
-DailySpending will be reset to 0 before trip calculation
-
+LastDayUsed will follow numeric weekday system, sunday as 0 and saturday as 7  
+	if LastDayUsed < Current Weekday  
+	DailySpending will be reset to 0 before trip calculation  
 
 ### Payment Gateway
 paymentGateway class : payment interface & decide on how to process card based on the card type
