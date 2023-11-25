@@ -27,25 +27,26 @@ FareSpending{
 	DailySpending  int
 }
 ```
-FareUsage, storing information of each route line combination, combination mean : Green->Red = GreenRed  
+**FareUsage**, storing information of each route line combination, combination mean : Green->Red = GreenRed  
 FareUsage will be used to store information for each route card holder has been going through  
 
-FareSpending, storing usage information of single line combination  
+**FareSpending**, storing usage information of single line combination  
 All 4 attributes value will be close to realtime as possible  
 
-LastWeekUsed will follow ISO Week, so it can be 52-53 in a year  
+**LastWeekUsed** will follow ISO Week, so it can be 52-53 in a year  
 &emsp;if LastWeekUsed < Current ISO Week  
-&emsp;WeeklySpending & DailySpending will be reset to 0 before trip calculation  
+&emsp;**WeeklySpending** & **DailySpending** will be reset to 0 before trip calculation  
 
-LastDayUsed will follow numeric weekday system, sunday as 0 and saturday as 7  
+**LastDayUsed** will follow numeric weekday system, sunday as 0 and saturday as 7  
 &emsp;if LastDayUsed < Current Weekday  
-&emsp;DailySpending will be reset to 0 before trip calculation  
+&emsp;**DailySpending** will be reset to 0 before trip calculation  
 
 ### Payment Gateway
 paymentGateway class : payment interface & decide on how to process card based on the card type  
-it has 2 function, Charge & Topup as interface to outside world  
+it has 2 function, **Charge** & **Topup** as interface to outside world  
 
-Payment gateway class will create a new payment processor based on Card type submitted for each function, so to handle each card type the  logic will be isolated on the payment processor
+Payment gateway class will create a new **PaymentProcessor** based on Card type processed,  
+so each card type logic will be owned by PaymentProcessor
 
 ```
 paymentProcessor interface {
@@ -59,9 +60,9 @@ Topup can be as simple as incresing the balance, or can be complex depend on the
 Charge flow generally will looks like :  
 1. check route fare config (from->to)
 2. check peaktime/non peaktime cost
-3. check card total spending, deciding on max deduction for this trip
-check 2 things, daily spending and weekly spending, compared to route fare caps
-4. compare fare cost to max deduction, if cost higher than max deduction,
-max deduciton used as cost, making sure the user does not overcharged
+3. check card total spending, deciding on max deduction for this trip  
+&emsp;&emsp;check 2 things, daily spending and weekly spending, compared to route fare caps
+4. compare fare cost to max deduction, if cost higher than max deduction,  
+&emsp;&emsp;max deduciton used as cost, making sure the user does not overcharged
 5. deduct balance
 6. update Card FareSpending information
