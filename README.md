@@ -61,7 +61,7 @@ Topup can be as simple as incresing the balance, or can be complex depend on the
 Charge flow typically follows these steps:
 1. Check the route fare configuration from origin to destination.
 2. Check peak-time or non-peak-time costs.
-3. Check card's total spending to determine the maxDeduction for the trip,  
+3. Check card's total spending to determine the **maxDeduction** for the trip,  
 &emsp;&emsp;check 2 things, daily spending and weekly spending, compared to route fare caps.
 4. Compare the fare cost to the maxDeduction. If the cost exceeds the maxDeduction,  
 &emsp;&emsp;max deduciton used as cost to ensure the user is not overcharged
