@@ -40,7 +40,7 @@ func (c *creditCardProcessor) Charge(
 		return travelCost, newBalance, common.Error{err, common.InternalParseTriptime}
 	}
 
-	travelCost, error = c.rs.GetTravelCost(travelRoute, &smartCard.Transactions)
+	travelCost, error = c.rs.GetTravelCost(travelRoute)
 	if error.Error != nil {
 		return travelCost, newBalance, error
 	}

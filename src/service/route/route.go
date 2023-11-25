@@ -26,7 +26,7 @@ type RouteService struct {
 	travelFaresMap map[string]model.TravelFaresConfig
 }
 
-func (r *RouteService) GetTravelCost(travelRoute model.TravelRoute, cardUsage *model.FareUsage) (cost int, error common.Error) {
+func (r *RouteService) GetTravelCost(travelRoute model.TravelRoute) (cost int, error common.Error) {
 
 	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
 
