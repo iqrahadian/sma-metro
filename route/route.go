@@ -23,16 +23,26 @@ type TravelRoute struct {
 }
 
 func NewRouteService() *RouteService {
-	return &RouteService{}
+
+	peakTimeMap := parsePeakTimeConfig()
+	travelFaresMap := parseTravelFaresConfig()
+
+	return &RouteService{
+		peakTimeMap,
+		travelFaresMap,
+	}
 }
 
-type RouteService struct{}
+type RouteService struct {
+	peakTimeMap    map[time.Weekday][]PeaktimeHour
+	travelFaresMap map[string]TravelFaresConfig
+}
 
 func (r *RouteService) GetTravelCost(travelRoute TravelRoute) (cost int, error common.Error) {
 
 	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
 
-	routeFare, ok := TravelFaresMap[stasion]
+	routeFare, ok := r.travelFaresMap[stasion]
 	if !ok {
 		return cost, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
 	}
@@ -50,7 +60,7 @@ func (r *RouteService) GetTravelCost(travelRoute TravelRoute) (cost int, error c
 
 func (r *RouteService) GetRouteFare(stasion string) (routeFare TravelFaresConfig, err common.Error) {
 
-	routeFare, ok := TravelFaresMap[stasion]
+	routeFare, ok := r.travelFaresMap[stasion]
 	if !ok {
 		return routeFare, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
 	}
@@ -63,7 +73,7 @@ func (r *RouteService) isPeaktime(route TravelRoute) (bool, common.Error) {
 
 	travelTime, _ := time.Parse(util.DATE_TIME_FORMAT, route.TripTime)
 
-	peakTimes, _ := PeaktimeMap[travelTime.Weekday()]
+	peakTimes, _ := r.peakTimeMap[travelTime.Weekday()]
 
 	for _, peakTime := range peakTimes {
 

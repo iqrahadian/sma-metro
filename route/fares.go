@@ -18,12 +18,6 @@ type TravelFaresConfig struct {
 	WeeklyCap    int
 }
 
-var TravelFaresMap map[string]TravelFaresConfig
-
-func init() {
-	TravelFaresMap = parseTravelFaresConfig()
-}
-
 func parseTravelFaresConfig() map[string]TravelFaresConfig {
 
 	faresMap := map[string]TravelFaresConfig{}
@@ -34,7 +28,6 @@ func parseTravelFaresConfig() map[string]TravelFaresConfig {
 	}
 	defer f.Close()
 
-	// read csv values using csv.Reader
 	csvReader := csv.NewReader(f)
 	data, err := csvReader.ReadAll()
 	if err != nil {

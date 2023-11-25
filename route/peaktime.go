@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/iqrahadian/sma-metro/common"
 	"github.com/iqrahadian/sma-metro/util"
 )
 
@@ -21,33 +20,6 @@ type PeakTimeConfig struct {
 type PeaktimeHour struct {
 	Start time.Time
 	End   time.Time
-}
-
-var PeaktimeMap map[time.Weekday][]PeaktimeHour
-
-func init() {
-	PeaktimeMap = parsePeakTimeConfig()
-}
-
-func IsPeaktimePrice(route TravelRoute) (bool, common.Error) {
-
-	travelTime, _ := time.Parse(util.DATE_TIME_FORMAT, route.TripTime)
-
-	peakTimes, _ := PeaktimeMap[travelTime.Weekday()]
-
-	for _, peakTime := range peakTimes {
-
-		isPeak, err := util.IsTimeBetween(travelTime, peakTime.Start, peakTime.End)
-		if err.Error != nil {
-			return isPeak, err
-		} else if isPeak {
-			return isPeak, err
-		}
-
-	}
-
-	return false, common.Error{}
-
 }
 
 func parsePeakTimeConfig() map[time.Weekday][]PeaktimeHour {
@@ -79,7 +51,7 @@ func parsePeakTimeConfig() map[time.Weekday][]PeaktimeHour {
 	}
 
 	for i, line := range data {
-		if i > 0 { // omit header line
+		if i > 0 { // skip header line
 			tmpConfig := PeakTimeConfig{
 				FromDay:   daysOfWeek[line[0]],
 				ToDay:     daysOfWeek[line[1]],
