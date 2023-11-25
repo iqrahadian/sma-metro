@@ -58,7 +58,7 @@ paymentProcessor interface {
 
 Topup can be as simple as incresing the balance, or can be complex depend on the card type.  
 
-Charge flow typically follows these steps:  
+Charge flow typically follows these steps:
 1. Check the route fare configuration from origin to destination.
 2. Check peak-time or non-peak-time costs.
 3. Check card's total spending to determine the maxDeduction for the trip,  
