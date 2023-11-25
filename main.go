@@ -25,7 +25,7 @@ func main() {
 
 	paymentGateway.Topup(&smartCard, 100)
 
-	fareApplied := 0
+	totalFareApplied := 0
 
 	for _, travelRoute := range travelRoutes {
 
@@ -35,12 +35,12 @@ func main() {
 			fmt.Println(common.GetErrorMessage(common.ErrorCode(err.Code)))
 			fmt.Println("--------------------------------------------------------->")
 		} else {
-			fareApplied += cost
+			totalFareApplied += cost
 		}
 	}
 
 	fmt.Println("Final Card Balance : ", smartCard.Balance)
-	fmt.Println("Total Fare Applied : ", fareApplied)
+	fmt.Println("Total Fare Applied : ", totalFareApplied)
 
 }
 
