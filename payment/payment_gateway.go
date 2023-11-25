@@ -10,7 +10,9 @@ import (
 	"github.com/iqrahadian/sma-metro/route"
 )
 
-type PaymentGateway struct{}
+type PaymentGateway struct {
+	rs *route.RouteService
+}
 
 func (p *PaymentGateway) Charge(card *card.SmartCard, travelRoute route.TravelRoute) (cost int, err common.Error) {
 
