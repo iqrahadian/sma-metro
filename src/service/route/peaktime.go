@@ -7,22 +7,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/iqrahadian/sma-metro/src/model"
 	"github.com/iqrahadian/sma-metro/util"
 )
 
-type PeakTimeConfig struct {
-	FromDay   time.Weekday
-	ToDay     time.Weekday
-	StartHour string
-	EndHour   string
-}
-
-type PeaktimeHour struct {
-	Start time.Time
-	End   time.Time
-}
-
-func parsePeakTimeConfig() map[time.Weekday][]PeaktimeHour {
+func parsePeakTimeConfig() map[time.Weekday][]model.PeaktimeHour {
 
 	var daysOfWeek = map[string]time.Weekday{
 		"sunday":    time.Sunday,
@@ -34,10 +23,10 @@ func parsePeakTimeConfig() map[time.Weekday][]PeaktimeHour {
 		"saturday":  time.Saturday,
 	}
 
-	peaktimeMap := map[time.Weekday][]PeaktimeHour{}
-	PeakTimeConfigArr := []PeakTimeConfig{}
+	peaktimeMap := map[time.Weekday][]model.PeaktimeHour{}
+	PeakTimeConfigArr := []model.PeakTimeConfig{}
 
-	f, err := os.Open("./input/peaktime.csv")
+	f, err := os.Open("./data/peaktime.csv")
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +41,7 @@ func parsePeakTimeConfig() map[time.Weekday][]PeaktimeHour {
 
 	for i, line := range data {
 		if i > 0 { // skip header line
-			tmpConfig := PeakTimeConfig{
+			tmpConfig := model.PeakTimeConfig{
 				FromDay:   daysOfWeek[line[0]],
 				ToDay:     daysOfWeek[line[1]],
 				StartHour: line[2],
@@ -87,9 +76,9 @@ func parsePeakTimeConfig() map[time.Weekday][]PeaktimeHour {
 		for i := peaktime.FromDay; i <= peaktime.ToDay; i++ {
 
 			if val, ok := peaktimeMap[i]; !ok {
-				peaktimeMap[i] = []PeaktimeHour{{startTime, endTime}}
+				peaktimeMap[i] = []model.PeaktimeHour{{startTime, endTime}}
 			} else {
-				peaktimeMap[i] = append(val, PeaktimeHour{startTime, endTime})
+				peaktimeMap[i] = append(val, model.PeaktimeHour{startTime, endTime})
 			}
 
 		}

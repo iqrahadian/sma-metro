@@ -1,6 +1,4 @@
-package card
-
-import "fmt"
+package model
 
 type CardType string
 
@@ -23,22 +21,5 @@ type SmartCard struct {
 	Type         CardType
 	Balance      int
 	Transactions FareUsage
-}
-
-func InitCard(cardType CardType) SmartCard {
-
-	switch cardType {
-	case CreditCardType:
-	case NFCDebitType:
-	case NFCRechargeableType:
-	default:
-		panic(fmt.Sprintf("Oops, Cannot recognize card type %s", cardType))
-	}
-
-	return SmartCard{
-		Type:         cardType,
-		Balance:      0,
-		Transactions: FareUsage{},
-	}
-
+	asd          int
 }
