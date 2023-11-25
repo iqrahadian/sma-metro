@@ -11,7 +11,7 @@ import (
 	"github.com/iqrahadian/sma-metro/util"
 )
 
-func parsePeakTimeConfig() map[time.Weekday][]model.PeaktimeHour {
+func parsePeakTimeConfig(filtePath string) map[time.Weekday][]model.PeaktimeHour {
 
 	var daysOfWeek = map[string]time.Weekday{
 		"sunday":    time.Sunday,
@@ -26,7 +26,7 @@ func parsePeakTimeConfig() map[time.Weekday][]model.PeaktimeHour {
 	peaktimeMap := map[time.Weekday][]model.PeaktimeHour{}
 	PeakTimeConfigArr := []model.PeakTimeConfig{}
 
-	f, err := os.Open("./data/peaktime.csv")
+	f, err := os.Open(filtePath)
 	if err != nil {
 		panic(err)
 	}

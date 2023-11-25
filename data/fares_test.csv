@@ -1,0 +1,5 @@
+fromline,toline,peak,nonpeak,dailycap,weeklycap
+green,green,2,1,8,55
+red,red,3,2,12,10
+green,red,4,3,15,90
+red,green,3,2,15,90

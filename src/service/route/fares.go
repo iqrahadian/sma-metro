@@ -11,11 +11,11 @@ import (
 	"github.com/iqrahadian/sma-metro/src/model"
 )
 
-func parseTravelFaresConfig() map[string]model.TravelFaresConfig {
+func parseTravelFaresConfig(filePath string) map[string]model.TravelFaresConfig {
 
 	faresMap := map[string]model.TravelFaresConfig{}
 
-	f, err := os.Open("./data/fares.csv")
+	f, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
 	}

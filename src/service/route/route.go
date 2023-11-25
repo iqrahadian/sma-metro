@@ -12,8 +12,11 @@ import (
 
 func NewRouteService() *RouteService {
 
-	peakTimeMap := parsePeakTimeConfig()
-	travelFaresMap := parseTravelFaresConfig()
+	peaktimePath := "./data/peaktime.csv"
+	travelFaresPath := "./data/fares.csv"
+
+	peakTimeMap := parsePeakTimeConfig(peaktimePath)
+	travelFaresMap := parseTravelFaresConfig(travelFaresPath)
 
 	return &RouteService{
 		peakTimeMap,
@@ -60,6 +63,8 @@ func (r *RouteService) GetRouteFare(stasion string) (routeFare model.TravelFares
 func (r *RouteService) isPeaktime(route model.TravelRoute) (bool, common.Error) {
 
 	travelTime, _ := time.Parse(util.DATE_TIME_FORMAT, route.TripTime)
+
+	fmt.Println("TODAY : ", travelTime.Weekday())
 
 	peakTimes, _ := r.peakTimeMap[travelTime.Weekday()]
 
