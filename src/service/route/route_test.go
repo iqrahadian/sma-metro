@@ -39,3 +39,40 @@ func TestIsPeakTime(t *testing.T) {
 	}
 
 }
+
+func TestGetTravelCost(t *testing.T) {
+
+	peakTimeMap := parsePeakTimeConfig("../../../data/peaktime_test.csv")
+	travelFaresMap := parseTravelFaresConfig("../../../data/fares_test.csv")
+	rs := RouteService{
+		peakTimeMap,
+		travelFaresMap,
+	}
+
+	type testStruct struct {
+		result      int
+		travelRoute model.TravelRoute
+	}
+
+	testData := []testStruct{
+
+		{1, model.TravelRoute{From: "green", To: "green", TripTime: "2021-03-01T08:58:30"}},
+		{2, model.TravelRoute{From: "green", To: "green", TripTime: "2021-03-01T07:58:30"}},
+		{3, model.TravelRoute{From: "green", To: "red", TripTime: "2021-03-01T08:58:30"}},
+		{4, model.TravelRoute{From: "green", To: "red", TripTime: "2021-03-01T07:58:30"}},
+		{5, model.TravelRoute{From: "red", To: "green", TripTime: "2021-03-01T08:58:30"}},
+		{6, model.TravelRoute{From: "red", To: "green", TripTime: "2021-03-01T07:58:30"}},
+		{7, model.TravelRoute{From: "red", To: "red", TripTime: "2021-03-01T08:58:30"}},
+		{8, model.TravelRoute{From: "red", To: "red", TripTime: "2021-03-01T07:58:30"}},
+	}
+
+	for _, singleTest := range testData {
+
+		cost, _ := rs.GetTravelCost(singleTest.travelRoute)
+		if singleTest.result != cost {
+			t.Errorf("Peaktime Result : %v, Want %v", cost, singleTest.result)
+			return
+		}
+	}
+
+}

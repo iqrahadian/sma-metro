@@ -64,8 +64,6 @@ func (r *RouteService) isPeaktime(route model.TravelRoute) (bool, common.Error) 
 
 	travelTime, _ := time.Parse(util.DATE_TIME_FORMAT, route.TripTime)
 
-	fmt.Println("TODAY : ", travelTime.Weekday())
-
 	peakTimes, _ := r.peakTimeMap[travelTime.Weekday()]
 
 	for _, peakTime := range peakTimes {
