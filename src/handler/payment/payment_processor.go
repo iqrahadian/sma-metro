@@ -40,11 +40,6 @@ func (c *creditCardProcessor) Charge(
 		return travelCost, newBalance, common.Error{err, common.InternalParseTriptime}
 	}
 
-	travelCost, error = c.rs.GetTravelCost(travelRoute)
-	if error.Error != nil {
-		return travelCost, newBalance, error
-	}
-
 	currentFareSpending := c.cs.GetFareSpending(smartCard, stasion)
 
 	weeklySpendTmp := currentFareSpending.WeeklySpending
@@ -56,18 +51,12 @@ func (c *creditCardProcessor) Charge(
 		dailySpendTmp = 0
 	}
 
-	maxDeduction := 0
-	if dailySpendTmp < routeFare.DailyCap && routeFare.DailyCap > 0 {
-		maxDeduction = routeFare.DailyCap - dailySpendTmp
+	travelCost, error = c.rs.GetTravelCost(travelRoute)
+	if error.Error != nil {
+		return travelCost, newBalance, error
 	}
 
-	if maxDeduction > 0 && weeklySpendTmp < routeFare.WeeklyCap && routeFare.WeeklyCap > 0 {
-		maxWeekDeduction := routeFare.WeeklyCap - weeklySpendTmp
-
-		if maxDeduction > maxWeekDeduction {
-			maxDeduction = maxWeekDeduction
-		}
-	}
+	maxDeduction := c.getMaxDeduction(routeFare, dailySpendTmp, weeklySpendTmp)
 
 	if travelCost > maxDeduction {
 		travelCost = maxDeduction
@@ -87,6 +76,29 @@ func (c *creditCardProcessor) Charge(
 
 	return travelCost, smartCard.Balance, error
 
+}
+
+func (c *creditCardProcessor) getMaxDeduction(
+	routeFare model.TravelFaresConfig,
+	dailySpend int,
+	weeklySpend int,
+) int {
+
+	maxDeduction := 0
+	if routeFare.DailyCap > 0 && dailySpend < routeFare.DailyCap {
+
+		maxDeduction = routeFare.DailyCap - dailySpend
+
+	} else if routeFare.WeeklyCap > 0 && weeklySpend < routeFare.WeeklyCap {
+
+		maxWeekDeduction := routeFare.WeeklyCap - weeklySpend
+
+		if maxDeduction > maxWeekDeduction {
+			maxDeduction = maxWeekDeduction
+		}
+	}
+
+	return maxDeduction
 }
 
 func (c *creditCardProcessor) Topup(card *model.SmartCard, amount int) common.Error {
