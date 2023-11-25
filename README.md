@@ -64,6 +64,6 @@ Charge flow typically follows these steps:
 3. Check card's total spending to determine the **maxDeduction** for the trip,  
 &emsp;&emsp;check 2 things, daily spending and weekly spending, compared to route fare caps.
 4. Compare the fare cost to the maxDeduction. If the cost exceeds the maxDeduction,  
-&emsp;&emsp;max deduciton used as cost to ensure the user is not overcharged
+&emsp;&emsp;maxDeduciton used as cost to ensure the user is not overcharged
 5. Deduct the trip's cost from card's balance.
 6. Update the Card's FareSpending information.
