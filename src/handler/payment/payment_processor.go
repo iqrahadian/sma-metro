@@ -25,11 +25,11 @@ type creditCardProcessor struct {
 func (c *creditCardProcessor) Charge(
 	smartCard *model.SmartCard,
 	travelRoute model.TravelRoute,
-) (totalCost int, newBalance int, error common.Error) {
+) (travelCost int, newBalance int, error common.Error) {
 
 	tripTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
 	if err != nil {
-		return totalCost, newBalance, common.Error{err, common.InternalParseTriptime}
+		return travelCost, newBalance, common.Error{err, common.InternalParseTriptime}
 	}
 	_, currentWeek := tripTime.ISOWeek()
 
@@ -37,12 +37,12 @@ func (c *creditCardProcessor) Charge(
 
 	routeFare, error := c.rs.GetRouteFare(stasion)
 	if err != nil {
-		return totalCost, newBalance, common.Error{err, common.InternalParseTriptime}
+		return travelCost, newBalance, common.Error{err, common.InternalParseTriptime}
 	}
 
-	totalCost, error = c.rs.GetTravelCost(travelRoute, &smartCard.Transactions)
+	travelCost, error = c.rs.GetTravelCost(travelRoute, &smartCard.Transactions)
 	if error.Error != nil {
-		return totalCost, newBalance, error
+		return travelCost, newBalance, error
 	}
 
 	currentFareSpending := c.cs.GetFareSpending(smartCard, stasion)
@@ -69,23 +69,23 @@ func (c *creditCardProcessor) Charge(
 		}
 	}
 
-	if totalCost > maxDeduction {
-		totalCost = maxDeduction
+	if travelCost > maxDeduction {
+		travelCost = maxDeduction
 	}
 
-	if smartCard.Balance < totalCost {
-		return totalCost, newBalance, common.Error{errors.New("Not enough balance"), common.CardInsufficientBalance}
+	if smartCard.Balance < travelCost {
+		return travelCost, newBalance, common.Error{errors.New("Not enough balance"), common.CardInsufficientBalance}
 	}
 
-	c.cs.UpdateBalance(
+	c.cs.UpdateCardBalance(
 		smartCard,
-		totalCost,
-		dailySpendTmp+totalCost,
-		weeklySpendTmp+totalCost,
+		travelCost,
+		dailySpendTmp+travelCost,
+		weeklySpendTmp+travelCost,
 		travelRoute,
 	)
 
-	return totalCost, smartCard.Balance, error
+	return travelCost, smartCard.Balance, error
 
 }
 

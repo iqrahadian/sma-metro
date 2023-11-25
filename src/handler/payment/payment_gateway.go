@@ -15,6 +15,15 @@ func NewPaymentHandler(
 	rs *route.RouteService,
 	cs *card.CardService,
 ) *PaymentGateway {
+
+	if rs == nil {
+		panic("Route service not initiated")
+	}
+
+	if cs == nil {
+		panic("Card service not initiated")
+	}
+
 	return &PaymentGateway{rs, cs}
 }
 
@@ -23,7 +32,10 @@ type PaymentGateway struct {
 	cs *card.CardService
 }
 
-func (p *PaymentGateway) Charge(card *model.SmartCard, travelRoute model.TravelRoute) (cost int, err common.Error) {
+func (p *PaymentGateway) Charge(
+	card *model.SmartCard,
+	travelRoute model.TravelRoute,
+) (cost int, err common.Error) {
 
 	time.Sleep(500 * time.Millisecond)
 	fmt.Println("Processing payment for trip from", travelRoute.From, "to", travelRoute.To, "on", travelRoute.TripTime)

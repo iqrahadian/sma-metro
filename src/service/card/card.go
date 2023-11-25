@@ -16,7 +16,7 @@ func NewCardService() *CardService {
 
 type CardService struct{}
 
-func (c *CardService) UpdateBalance(
+func (c *CardService) UpdateCardBalance(
 	card *model.SmartCard,
 	totalCost int,
 	dailySpend int,
