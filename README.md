@@ -5,7 +5,7 @@
 
 ## code structure/ideas
 1. card is an object holding balance & transaction data, but should not modify it's own information
-2. all data changes executed by PaymentGateway class, as it's represent a payment services
+2. all data changes executed by PaymentGateway class, it's represent a payment services
 3. I add 3 digit number for error code identifier, will be printed when error arised, representing a card tap machine that can only show limited information
 
 ## object/class description
@@ -28,16 +28,18 @@ FareSpending{
 }
 ```
 FareUsage, storing information of each route line combination, combination mean : Green->Red = GreenRed
-FareUsage will be used as an information on each route card holder has going through
+FareUsage will be used to store information for each route card holder has been going through
 
 FareSpending, storing usage information of single line combination
 All 4 attributes value will be close to realtime as possible
+
 LastWeekUsed will follow ISO Week, so it can be 52-53 in a year
-    if LastWeekUsed < Current ISO Week
-        WeeklySpending & DailySpending will be reset to 0 before trip calculation
+if LastWeekUsed < Current ISO Week
+WeeklySpending & DailySpending will be reset to 0 before trip calculation
+
 LastDayUsed will follow numeric weekday system, sunday as 0 and saturday as 7
-    if LastDayUsed < Current Weekday
-        DailySpending will be reset to 0 before trip calculation
+if LastDayUsed < Current Weekday
+DailySpending will be reset to 0 before trip calculation
 
 ### Payment Gateway
 paymentGateway class : payment interface & decide on how to process card based on the card type
