@@ -11,7 +11,7 @@
 ## object/class description
 ### Card
 card object will hold information about the card, such as CardType, Balance & FareUsages
-
+```
 Card {
     CardType string
     Balance int
@@ -26,7 +26,7 @@ FareSpending{
 	WeeklySpending int
 	DailySpending  int
 }
-
+```
 FareUsage, storing information of each route line combination, combination mean : Green->Red = GreenRed
 FareUsage will be used as an information on each route card holder has going through
 
@@ -44,12 +44,12 @@ paymentGateway class : payment interface & decide on how to process card based o
 have 2 function, Charge & Topup as interface to outside world
 
 Payment gateway class will create a new payment processor based on Card type submitted for each function, so to handle each card type the logic will be isolated on the payment processor
-
+```
 paymentProcessor interface {
 	Charge(*card.SmartCard, route.TravelRoute)
 	Topup(*card.SmartCard, int)
 }
-
+```
 Topup can be as simple as incresing the balance, or can be complex depend on the card type
 Charge flow generally will looks like :
     1. check route fare config (from->to)
