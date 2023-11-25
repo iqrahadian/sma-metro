@@ -23,17 +23,17 @@ func (c *creditCardProcessor) Charge(
 	travelRoute route.TravelRoute,
 ) (cost int, balance int, error common.Error) {
 
-	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
-	routeFare, ok := route.TravelFaresMap[stasion]
-	if !ok {
-		return cost, balance, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
-	}
-
 	tripTime, err := time.Parse(util.DATE_TIME_FORMAT, travelRoute.TripTime)
 	if err != nil {
 		return cost, balance, common.Error{err, common.InternalParseTriptime}
 	}
 	_, currentWeek := tripTime.ISOWeek()
+
+	stasion := fmt.Sprintf("%s%s", travelRoute.From, travelRoute.To)
+	routeFare, ok := route.TravelFaresMap[stasion]
+	if !ok {
+		return cost, balance, common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
+	}
 
 	cardUsages := &smartCard.Transactions
 	fareUsages, ok := (*cardUsages)[stasion]
@@ -51,6 +51,14 @@ func (c *creditCardProcessor) Charge(
 
 	}
 
+	cost = routeFare.StandardCost
+	isPeak, error := route.IsPeaktimePrice(travelRoute)
+	if error.Error != nil {
+		return cost, balance, error
+	} else if isPeak {
+		cost = routeFare.PeakCost
+	}
+
 	maxDeduction := 0
 	if fareUsages.DailySpending < routeFare.DailyCap && routeFare.DailyCap > 0 {
 		maxDeduction = routeFare.DailyCap - fareUsages.DailySpending
@@ -62,14 +70,6 @@ func (c *creditCardProcessor) Charge(
 		if maxDeduction > maxWeekDeduction {
 			maxDeduction = maxWeekDeduction
 		}
-	}
-
-	cost = routeFare.StandardCost
-	isPeak, error := route.IsPeaktimePrice(travelRoute)
-	if error.Error != nil {
-		return cost, balance, error
-	} else if isPeak {
-		cost = routeFare.PeakCost
 	}
 
 	if cost > maxDeduction {
