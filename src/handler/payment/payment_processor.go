@@ -68,7 +68,7 @@ func (c *creditCardProcessor) Charge(
 
 	c.cs.UpdateCardBalance(
 		smartCard,
-		travelCost,
+		smartCard.Balance-travelCost,
 		dailySpendTmp+travelCost,
 		weeklySpendTmp+travelCost,
 		travelRoute,

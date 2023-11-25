@@ -1,7 +1,6 @@
 package card
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -18,7 +17,7 @@ type CardService struct{}
 
 func (c *CardService) UpdateCardBalance(
 	card *model.SmartCard,
-	totalCost int,
+	balance int,
 	dailySpend int,
 	weeklySpend int,
 	travelRoute model.TravelRoute,
@@ -34,10 +33,11 @@ func (c *CardService) UpdateCardBalance(
 
 	fareSpending, ok := card.Transactions[stasion]
 	if !ok {
-		return common.Error{Error: errors.New("Unkown Route"), Code: common.FaresUnknown}
+		fareSpending = new(model.FareSpending)
+		card.Transactions[stasion] = fareSpending
 	}
 
-	card.Balance -= totalCost
+	card.Balance = balance
 
 	fareSpending.LastWeekUsed = currentWeek
 	fareSpending.LastDayUsed = int(tripTime.Weekday())
